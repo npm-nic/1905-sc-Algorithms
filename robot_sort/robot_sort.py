@@ -10,25 +10,18 @@ class SortingRobot:
         self._time = 0          # A time counter (stretch)
 
     def can_move_right(self):
-        """
-        Returns True if the robot can move right or False if it's
-        at the end of the list.
-        """
+        # Returns True if the robot can move right or False if it's at the end of the list.
         return self._position < len(self._list) - 1
 
     def can_move_left(self):
-        """
-        Returns True if the robot can move left or False if it's
-        at the start of the list.
-        """
+        # Returns True if the robot can move left or False if it's at the start of the list.
         return self._position > 0
 
     def move_right(self):
-        """
-        If the robot can move to the right, it moves to the right and
-        returns True. Otherwise, it stays in place and returns False.
-        This will increment the time counter by 1.
-        """
+        # IF: the robot can move to the right
+        # --> it moves to the right and returns True.
+        # Otherwise, it stays in place and returns False.
+        # --> This will increment the time counter by 1.
         self._time += 1
         if self._position < len(self._list) - 1:
             self._position += 1
@@ -37,11 +30,10 @@ class SortingRobot:
             return False
 
     def move_left(self):
-        """
-        If the robot can move to the left, it moves to the left and
-        returns True. Otherwise, it stays in place and returns False.
-        This will increment the time counter by 1.
-        """
+        # If the robot can move to the left
+        # --> it moves to the left and returns True.
+        # Otherwise, it stays in place and returns False.
+        # --> This will increment the time counter by 1.
         self._time += 1
         if self._position > 0:
             self._position -= 1
@@ -50,23 +42,18 @@ class SortingRobot:
             return False
 
     def swap_item(self):
-        """
-        The robot swaps its currently held item with the list item in front
-        of it.
-        This will increment the time counter by 1.
-        """
+        # The robot swaps its currently held item with the list item in front of it.
+        # --> This will increment the time counter by 1.
         self._time += 1
-        # Swap the held item with the list item at the robot's position
+        # Swap the held item with the list item at the robot's position ⬇️
         self._item, self._list[self._position] = self._list[self._position], self._item
 
     def compare_item(self):
-        """
-        Compare the held item with the item in front of the robot:
-        If the held item's value is greater, return 1.
-        If the held item's value is less, return -1.
-        If the held item's value is equal, return 0.
-        If either item is None, return None.
-        """
+        # Compare the held item with the item in front of the robot:
+        # --> IF: the held item's value is greater, return 1.
+        # --> ELSE IF: the held item's value is less, return -1.
+        # --> ELSE IF: the held item's value is equal, return 0.
+        # --> ELSE: either item is None, return None.
         if self._item is None or self._list[self._position] is None:
             return None
         elif self._item > self._list[self._position]:
@@ -77,27 +64,64 @@ class SortingRobot:
             return 0
 
     def set_light_on(self):
-        """
-        Turn on the robot's light
-        """
+        # Turn on the robot's light
         self._light = "ON"
+
     def set_light_off(self):
-        """
-        Turn off the robot's light
-        """
+        # Turn off the robot's light
         self._light = "OFF"
+
     def light_is_on(self):
-        """
-        Returns True if the robot's light is on and False otherwise.
-        """
+        # Returns True if the robot's light is on and False otherwise.
         return self._light == "ON"
 
     def sort(self):
-        """
-        Sort the robot's list.
-        """
-        # Fill this out
-        pass
+        # Sort the robot's list.
+        '''---------> my code starts here <----------'''
+        # if light is on, robot is holding an item
+
+        # while [CAN MOVE RIGHT] and [NOT HOLDING ANYTHING <-> light is off]
+        while self.can_move_right() and self.light_is_on() is False:
+            # move right, pick up (swap) something, and turn on light to indicate holding something
+            self.move_right()
+            self.swap_item()
+            self.set_light_on()
+
+            # when robot gets here, it has already gone all the way to the right
+            # --> WHILE [CAN MOVE LEFT] and [HOLDING SOMETHING <-> light is on]...
+            while self.can_move_left() and self.light_is_on():
+                # begin moving left
+                self.move_left()
+                # IF: current item is smaller than the one you're in front of ... compare_item() will return -1
+                if self.compare_item() == -1:
+                    # swap so that robot has the bigger item
+                    self.swap_item()
+                    # move_right to the empty slot
+                    # swap_item to place it there
+                    # turn off light to indicate holding nothing
+                    self.move_right()
+                    self.swap_item()
+                    self.set_light_off()
+                    # move_left to smaller item
+                    # swap_item to pick it up this smaller number
+                    # turn light on to REPEAT this process (turn light on)
+                    self.move_left()
+                    self.swap_item()
+                    self.set_light_on()
+                # ELSE: the held item is larger than the one you're in front of
+                # --> compare_item() will return != 1 and we'll move down here
+                else:
+                    # move_right
+                    # swap_item to put the larger number into the empty slot
+                    # repeat ENTIRE process (turn light off)
+                    self.move_right()
+                    self.swap_item()
+                    self.set_light_off()
+
+            # if you've reached all the way to the left, put the last item down and the list is sorted
+            if self.can_move_left() is False:
+                self.swap_item()
+                self.set_light_off()
 
 
 if __name__ == "__main__":
